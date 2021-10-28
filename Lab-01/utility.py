@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 class Utility:
     # Read a file from filename, return bonus points and matrix
     def read_file(filename):
-        bonud_points, matrix = [], []
+        bonus_points, matrix = [], []
         with open(filename) as f:
             n_bonus_points = int(next(f)[:-1])
             bonus_points = []
@@ -15,7 +15,7 @@ class Utility:
             text = f.read()
             matrix = [list(i) for i in text.splitlines()]
 
-        return bonud_points, matrix
+        return bonus_points, matrix
 
     # Get starting and ending of a matrix
     def get_start_end(matrix):
