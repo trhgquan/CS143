@@ -7,6 +7,10 @@
 import sys, getopt
 from utility import *
 
+# BO SUNG IMPORT THU VIEN O DAY
+
+###############################
+
 def main(argv):
     input_file, output_file = '', ''
     try:
@@ -27,6 +31,13 @@ def main(argv):
 
     bonus_points, matrix = Utility.read_file(input_file)
     start, end = Utility.get_start_end(matrix)
+
+    # BO SUNG HAM GOI THUAT TOAN O DAY
+
+
+
+    ##################################
+
 
     plt = Utility.visualize_maze(matrix, bonus_points, start, end)
     plt.savefig(output_file)
