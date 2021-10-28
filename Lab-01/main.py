@@ -32,6 +32,7 @@ def main(argv):
     bonus_points, matrix = Utility.read_file(input_file)
     start, end = Utility.get_start_end(matrix)
 
+    route = []
     # BO SUNG HAM GOI THUAT TOAN O DAY
 
 
@@ -39,7 +40,7 @@ def main(argv):
     ##################################
 
 
-    plt = Utility.visualize_maze(matrix, bonus_points, start, end)
+    plt = Utility.visualize_maze(matrix, bonus_points, start, end, route)
     plt.savefig(output_file)
 
 if __name__ == '__main__':
