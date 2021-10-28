@@ -1,5 +1,5 @@
 #
-#   COMMANDLINE: python3 main.py --input=<input_file>.txt --output=<output_file.txt>
+#   COMMANDLINE: python3 main.py --input=<input_file>.txt --output=<output_file>
 #
 #   Code by ndthang01 ft. trhgquan
 #
