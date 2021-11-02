@@ -10,7 +10,7 @@ def try_bfs(matrix,start,end):
 
     while len(frontier) != 0:
         current = frontier.popleft() #current is (x,y)
-        
+        if(current == end): break
         x_pos = current[0] #row position
         y_pos = current[1] #column position
         neighbors = []
