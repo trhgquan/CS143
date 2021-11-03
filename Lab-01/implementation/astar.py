@@ -23,13 +23,11 @@ class AStar(GreedyBFS):
                 if not self.inside(next):
                     continue
 
-                if (self.matrix[next[0]][next[1]] != self.wall_char):
-                    print(next, self.matrix[next[0]][next[1]])
-                    new_cost = cost[current] + self.heuristic(current, next)
+                new_cost = cost[current] + self.heuristic(current, next)
 
-                    if (next not in cost) or (new_cost < cost[next]):
-                        cost[next] = new_cost
-                        waiting.put(item = next, priority = new_cost)
-                        trace[next] = current
+                if (next not in cost) or (new_cost < cost[next]):
+                    cost[next] = new_cost
+                    waiting.put(item = next, priority = new_cost)
+                    trace[next] = current
 
         return self.create_route(trace)

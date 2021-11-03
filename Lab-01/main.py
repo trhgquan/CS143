@@ -6,11 +6,10 @@
 
 import sys, getopt
 from utility import *
-
-# BO SUNG IMPORT THU VIEN O DAY
-
-
-###############################
+from implementation.DFS import *
+from implementation.BFS import *
+from implementation.greedy_bfs import *
+from implementation.astar import *
 
 def main(argv):
     input_file, output_file, algorithm_used = '', '', ''
@@ -36,22 +35,19 @@ def main(argv):
     start, end = Utility.get_start_end(matrix)
 
     route = []
-    # BO SUNG HAM GOI THUAT TOAN O DAY
+
     if algorithm_used == 'dfs':
-        pass
+        route = DFS(matrix, start, end).Try()
     elif algorithm_used == 'bfs':
-        pass
+        route = BFS(matrix, start, end).Try()
     elif algorithm_used == 'greedy':
-        pass
+        route = GreedyBFS(matrix, start, end).Try()
     elif algorithm_used == 'astar':
-        pass
+        route = AStar(matrix, start, end).Try()
     elif algorithm_used == 'bonus':
         pass
     else:
         print('Algorithm not specified.')
-
-    ##################################
-
 
     plt = Utility.visualize_maze(matrix, bonus_points, start, end, route)
     plt.savefig(output_file)
