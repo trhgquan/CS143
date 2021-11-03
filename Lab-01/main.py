@@ -8,7 +8,8 @@ import sys, getopt
 from utility import *
 
 # BO SUNG IMPORT THU VIEN O DAY
-
+from implementation import BFS, DFS
+from collections import deque
 ###############################
 
 def main(argv):
@@ -34,9 +35,12 @@ def main(argv):
 
     route = []
     # BO SUNG HAM GOI THUAT TOAN O DAY
-
-
-
+    # DFS
+    reached = deque()
+    reached.append(start)
+    route = DFS.try_dfs(matrix, start, end,reached)
+    #BFS
+    route = BFS.try_bfs(matrix,start,end)
     ##################################
 
 
