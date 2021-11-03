@@ -49,18 +49,18 @@ class Utility:
             direction.pop(0)
 
         # 2. Drawing the map
-        ax = plt.figure(dpi = 100).add_subplot(111)
+        ax = plt.figure(dpi = 4000).add_subplot(111)
 
         for i in ['top', 'bottom', 'right', 'left']:
             ax.spines[i].set_visible(False)
 
         plt.scatter([i[1] for i in walls], [-i[0] for i in walls],
-                    marker = 'X', s = 100, color = 'black')
+                    marker = 'X', s = 10, color = 'black')
 
         plt.scatter([i[1] for i in bonus], [-i[0] for i in bonus],
-                    marker = 'P', s = 100, color = 'green')
+                    marker = 'P', s = 10, color = 'green')
 
-        plt.scatter(start[1], -start[0], marker = '*', s = 100, color = 'gold')
+        plt.scatter(start[1], -start[0], marker = '*', s = 10, color = 'gold')
 
         if route:
             for i in range(len(route) - 2):
