@@ -1,7 +1,7 @@
 from collections import deque
 def try_dfs(matrix, start, end,reached):
-    if start == end: return 
-    if end in reached: return
+    # if start == end: return 
+    # if end in reached: return reached
     # reached contain positions visited
     # find the neighbors of start
     neighbors = []
@@ -21,8 +21,12 @@ def try_dfs(matrix, start, end,reached):
     if(matrix[start_row+1][start_col] != 'x'):
         neighbors.append((start_row+1,start_col))
 
+
     for next in neighbors:
         if next not in reached:
             reached.append(next)
-            try_dfs(matrix,next,end,reached)
+            route = try_dfs(matrix,next,end,reached)
+            if end in route:
+                break
+    
     return reached
