@@ -21,11 +21,8 @@ class BFS(IAlgorithm):
 
             for step in self.steps:
                 next = (current[0] + step[0], current[1] + step[1])
-                if self.inside(next):
-                    neighbors.append(next)
 
-            for next in neighbors:
-                if next not in reached:
+                if self.inside(next) and next not in reached:
                     trace[next] = current
                     frontier.append(next)
                     reached.append(next)
