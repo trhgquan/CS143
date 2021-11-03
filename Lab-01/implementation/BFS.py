@@ -1,42 +1,33 @@
-from collections import deque
-def try_bfs(matrix,start,end):
-    #start have format (row, column)
-    frontier = deque()
-    reached = deque()
-    frontier.append(start)
-    reached.append(start)
-    # frontier have tuple (x,y)
-    # reached contain points that is visited
+from .IAlgorithm import *
 
-    while len(frontier) != 0:
-        current = frontier.popleft() #current is (x,y)
-        if(current == end): break
-        x_pos = current[0] #row position
-        y_pos = current[1] #column position
-        neighbors = []
-       
-        # find the neighbors nearby current
-        #left
-        if(matrix[x_pos][y_pos-1] != 'x'):
-            neighbors.append((x_pos,y_pos-1))
-        #right
-        if(matrix[x_pos][y_pos+1] != 'x'):
-            neighbors.append((x_pos,y_pos+1))
-        #up
-        if(matrix[x_pos-1][y_pos] != 'x'):
-            neighbors.append((x_pos-1,y_pos))
-        # down
-        if(matrix[x_pos+1][y_pos] != 'x'):
-            neighbors.append((x_pos+1,y_pos))
+class BFS(IAlgorithm):
+    def __init__(self, matrix, start, end):
+        super().__init__(matrix, start, end)
 
-        # neighbors not visited, put it in frontier
-        for next in neighbors:
-            if next not in reached:
-                frontier.append(next)
-                reached.append(next)
-    # neighbors file contain the position visited 
-    f = open('neighbors_BFS.txt','w')
-    for pos in reached:
-        print(pos,file = f)
-    f.close()
-    return reached
+    def Try(self):
+        frontier, reached = deque(), []
+        frontier.append(self.start)
+        reached.append(self.start)
+
+        trace = dict()
+        trace[self.start] = None
+
+        while len(frontier) != 0:
+            current = frontier.popleft()
+
+            if (current == self.end): break
+
+            neighbors = []
+
+            for step in self.steps:
+                next = (current[0] + step[0], current[1] + step[1])
+                if self.inside(next):
+                    neighbors.append(next)
+
+            for next in neighbors:
+                if next not in reached:
+                    trace[next] = current
+                    frontier.append(next)
+                    reached.append(next)
+
+        return self.create_route(trace)
