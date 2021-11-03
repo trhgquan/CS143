@@ -49,7 +49,7 @@ class Utility:
             direction.pop(0)
 
         # 2. Drawing the map
-        ax = plt.figure(dpi = 4000).add_subplot(111)
+        ax = plt.figure(dpi = 100).add_subplot(111)
 
         for i in ['top', 'bottom', 'right', 'left']:
             ax.spines[i].set_visible(False)
@@ -65,7 +65,7 @@ class Utility:
         if route:
             for i in range(len(route) - 2):
                 plt.scatter(route[i + 1][1], -route[i + 1][0],
-                marker = direction[i], color = 'silver')
+                marker = direction[i], s = 10, color = 'silver')
 
         plt.text(end[1], -end[0], 'EXIT', color = 'red',
                  horizontalalignment = 'center',
