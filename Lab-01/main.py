@@ -27,7 +27,7 @@ def main(argv):
         elif opt == '--algo':
             algorithm_used = arg
 
-    if (input_file == '' or output_file == '' or algorithm_used == ''):
+    if (input_file == '' or output_file == ''):
         print('Arguments missing, try again.')
         sys.exit(2)
 
@@ -47,7 +47,7 @@ def main(argv):
     elif algorithm_used == 'bonus':
         pass
     else:
-        print('Algorithm not specified.')
+        print('Algorithm not specified. Printing the map without route to exit..')
 
     plt = Utility.visualize_maze(matrix, bonus_points, start, end, route)
     plt.savefig(output_file)

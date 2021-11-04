@@ -17,8 +17,6 @@ class BFS(IAlgorithm):
 
             if (current == self.end): break
 
-            neighbors = []
-
             for step in self.steps:
                 next = (current[0] + step[0], current[1] + step[1])
 

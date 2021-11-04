@@ -1,23 +1,28 @@
-## 0. Contribution
-1. **fork** về local
-2. Khi đã commit xong, tạo mới 1 pull request
+## Thông tin
+Chương trình chạy dưới dạng command-line
 
-Làm thế này để tránh tôi với ông gây conflict lẫn nhau :/
+## Cài đặt
+Cài các thư viện hỗ trợ: `pip install requirements.txt`
 
-## 1. Cài đặt thư viện hỗ trợ
+## Hướng dẫn sử dụng
+Hỗ trợ các thuật sau:
+
+|Tên thuật |Code thuật|
+|----------|----------|
+|   DFS    |  `dfs`   |
+|   BFS    |  `bfs`   |
+|Greedy BFS| `greedy` |
+|A-Star    | `astar`  |
+|Thuật tìm đường trên bản đồ có bonus| `bonus` |
+
+Chạy code dưới dạng command-line:
 ```
-pip install requirements.txt
+python main.py --input=<tên file input>.txt --output=<tên file output>.png --algo=<code thuật>
 ```
 
-## 2. Chạy
-- Data trong thư mục `sample`
-
+Ví dụ: Chạy thuật toán A-Star trên bản đồ `sample/01.txt`, output ra file `01-astar.png`:
 ```
-python main.py --input=<tên file input> --output=<tên file ảnh output>.png
+python main.py --input=sample/01.txt --output=01-astar.png --algo=astar
 ```
 
-## 3. Chương trình
-- Viết phần thuật giải thành 1 module trong folder trong implementation
-- Để chạy code, import `implementation.<tên thư viện>`, bổ sung thêm hàm gọi trong `main.py > main()` (phần tôi đã comment ấy)
-
-Happy coding!
+**Chú ý**: Để trống option `--algo` thì chương trình sẽ in ra bản đồ không có đường đi.
