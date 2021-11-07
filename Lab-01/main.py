@@ -10,6 +10,7 @@ from implementation.DFS import *
 from implementation.BFS import *
 from implementation.greedy_bfs import *
 from implementation.astar import *
+from implementation.bonus import *
 
 def main(argv):
     input_file, output_file, algorithm_used = '', '', ''
@@ -45,7 +46,7 @@ def main(argv):
     elif algorithm_used == 'astar':
         route = AStar(matrix, start, end).Try()
     elif algorithm_used == 'bonus':
-        pass
+        route = Bonus(matrix, start, end, bonus_points).Try()
     else:
         print('Algorithm not specified. Printing the map without route to exit..')
 
