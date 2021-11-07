@@ -2,7 +2,7 @@
 Chương trình chạy dưới dạng command-line
 
 ## Cài đặt
-Cài các thư viện hỗ trợ: `pip install requirements.txt`
+Cài các thư viện hỗ trợ: `pip install -r requirements.txt`
 
 ## Hướng dẫn sử dụng
 Hỗ trợ các thuật sau:
