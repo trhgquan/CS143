@@ -17,6 +17,8 @@ class Bonus(IAlgorithm):
             if (x, y) not in self.bonus_points:
                 self.bonus_points[(x, y)] = w
 
+        self.min_bonus_points = self.bonus_points[min(self.bonus_points.keys(), key = (lambda k : self.bonus_points[k]))]
+
     def heuristic(self, start, end):
         x1, y1 = start[0], start[1]
         x2, y2 = end[0], end[1]
@@ -24,7 +26,32 @@ class Bonus(IAlgorithm):
         if end in self.bonus_points:
             return self.bonus_points[end]
 
-        return abs(x1 - x2) + abs(y1 - y2) + abs(self.bonus_points[min(self.bonus_points.keys(), key = (lambda k : self.bonus_points[k]))])
+        return abs(self.min_bonus_points)
+
+    def create_route(self, trace):
+        current = self.end
+        path = []
+
+        total_bonuses = 0
+        total_cost = 0
+
+        while current != self.start:
+            path.append(current)
+            total_cost += 1
+            if current in self.bonus_points:
+                total_bonuses += self.bonus_points[current]
+                total_cost += self.bonus_points[current]
+                print(current)
+            current = trace[current]
+
+        total_cost = 0 if total_cost < 0 else total_cost
+        print('Total bonuses:', total_bonuses)
+        print('Total cost:', total_cost)
+
+        path.append(self.start)
+        path.reverse()
+
+        return path
 
     def Try(self):
         waiting = deque()
