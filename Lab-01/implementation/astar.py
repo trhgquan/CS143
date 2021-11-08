@@ -23,7 +23,7 @@ class AStar(GreedyBFS):
                 if not self.inside(next):
                     continue
 
-                new_cost = cost[current] + self.heuristic(current, next)
+                new_cost = cost[current] + self.heuristic(current, self.end)
 
                 if (next not in cost) or (new_cost < cost[next]):
                     cost[next] = new_cost
