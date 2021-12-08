@@ -1,0 +1,10 @@
+8
+B
+-A OR C
+-B OR D
+-C OR E
+-D OR F
+-E OR G
+-F OR H
+{}
+YES
