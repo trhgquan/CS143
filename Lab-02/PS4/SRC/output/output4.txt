@@ -1,16 +1,19 @@
-4
-R
--P OR S OR T
--R OR T
--R OR S
+10
+A OR -D
+-C
+A
+B OR -C
+A OR B OR -C
+-C OR -D
+D
+A OR D
+-B OR -D
+-B
 6
-S OR T
--P OR T
--P OR S
--R
-T
-S
-2
--P
+A OR B
+A OR -B OR -C
+A OR B OR -D
+A OR C
 {}
+A OR -C OR -D
 YES

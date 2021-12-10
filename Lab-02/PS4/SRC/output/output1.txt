@@ -1,10 +1,22 @@
-3
--A
-B
--C
-4
+7
+B OR C
+A OR D
+B OR -D
+-A OR B
+-C OR D
 -B OR C
+-B
+9
+B
 A OR C
-A OR -B
+A
+-C
+C OR D
+-A OR D
+B OR D
+C
+-A
+2
+D
 {}
 YES

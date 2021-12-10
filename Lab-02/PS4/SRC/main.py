@@ -17,12 +17,16 @@ def main():
         output_file = OUTPUT_DIR + file.replace('input', 'output')
 
         with open(input_file, 'r+') as f:
-            alpha = f.readline().strip()
-            n = int(f.readline().strip())
-            kb = []
-            for i in range(n):
-                clause = f.readline().strip()
-                kb.append(clause)
+            try:
+                alpha = f.readline().strip()
+                n = int(f.readline().strip())
+                kb = []
+                for i in range(n):
+                    clause = f.readline().strip()
+                    kb.append(clause)
+            except:
+                print('Error processing', input_file, ', maybe the file is empty?')
+                continue
 
         resolver = logic_resolution(kb, alpha)
         resolver.pl_resolution()

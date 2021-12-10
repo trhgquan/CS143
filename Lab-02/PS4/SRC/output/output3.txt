@@ -1,10 +1,22 @@
-2
--C
--B OR C
-2
--A OR C
-A OR -B
-1
-A OR -C
-0
-NO
+8
+U OR V OR X OR Y
+T OR U OR X OR Y
+T OR V OR X OR Y
+T OR U OR V OR X
+T OR U OR V OR Y
+-Y
+-U
+V
+11
+U OR X OR Y
+V OR X OR Y
+U OR V OR X
+U OR V OR Y
+T OR X OR Y
+T OR U OR X
+T OR U OR Y
+{}
+T OR V OR X
+T OR U OR V
+T OR V OR Y
+YES

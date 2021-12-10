@@ -1,3 +1,5 @@
+
+
 from io import FileIO
 
 class logic_resolution:
@@ -6,6 +8,7 @@ class logic_resolution:
     def __init__(self, kb : list, alpha : list) -> None:
         self.__has_solution = False
         self.__output_clauses = []
+        self.__detail_combinations = []
         self.__kb = []
 
         # Preprocessing KB
@@ -155,6 +158,7 @@ class logic_resolution:
         '''
         while True:
             self.__output_clauses.append([])
+            self.__detail_combinations.append([])
             new_clauses = []
 
             for i in range(len(self.__kb) - 1):
@@ -162,35 +166,44 @@ class logic_resolution:
                     resolvents = self.pl_resolve(self.__kb[i], self.__kb[j])
 
                     if [] in resolvents:
-                        new_clauses.append([])
+                        new_clauses.append(([], self.__kb[i], self.__kb[j]))
                         self.__has_solution = True
                     
                     for resolvent_ in resolvents:
                         if self.is_always_valid(resolvent_):
                             continue
                         if resolvent_ not in self.__kb and resolvent_ not in self.__output_clauses[-1]:
-                            new_clauses.append(resolvent_)
+                            new_clauses.append((resolvent_, self.__kb[i], self.__kb[j]))
             
             if len(new_clauses) == 0:
                 self.__has_solution = False
                 return False
 
             for x in new_clauses:
-                if x not in self.__kb: self.__kb.append(x)
-                if x not in self.__output_clauses[-1]: self.__output_clauses[-1].append(x)
+                if x[0] not in self.__kb: self.__kb.append(x[0])
+                if x[0] not in self.__output_clauses[-1]: 
+                    self.__output_clauses[-1].append(x[0])
+                    self.__detail_combinations[-1].append((x[1], x[2]))
 
             if self.__has_solution:
                 return True
     
-    def print_output(self, f : FileIO = None) -> None:
+    def print_output(self, details : bool = False, f : FileIO = None) -> None:
         '''Print output to a readable form.
 
         Args:
+            - details (bool) : If this is True, then the combination will be printed.
             - f (FileIO) : file handle to print.
         '''
-        for clause in self.__output_clauses:
-            print(len(clause), file = f)
-            for c in clause:
-                print(self.cnf_format(c), file = f)
+        for i in range(len(self.__output_clauses)):
+            print(len(self.__output_clauses[i]), file = f)
+            for j in range(len(self.__output_clauses[i])):
+                if not details:
+                    print(self.cnf_format(self.__output_clauses[i][j]), file = f)
+                else:
+                    print('{0} created by combine {1} with {2}'.format(
+                        self.cnf_format(self.__output_clauses[i][j]),
+                        self.cnf_format(self.__detail_combinations[i][j][0]),
+                        self.cnf_format(self.__detail_combinations[i][j][1])), file = f)
         
         print('YES', file = f) if self.__has_solution else print('NO', file = f)
