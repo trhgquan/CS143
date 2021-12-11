@@ -1,5 +1,3 @@
-
-
 from io import FileIO
 
 class logic_resolution:
