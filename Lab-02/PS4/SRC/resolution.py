@@ -147,12 +147,9 @@ class logic_resolution:
 
     def pl_resolution(self) -> bool:
         '''Resolve given KB and alpha.
-
-        Args:
-            - self
         
         Returns:
-            - bool
+            - bool : True if it is resolvable, False otherwise.
         '''
         while True:
             self.__output_clauses.append([])
@@ -199,7 +196,7 @@ class logic_resolution:
                 if not details:
                     print(self.cnf_format(self.__output_clauses[i][j]), file = f)
                 else:
-                    print('{0} created by combine {1} with {2}'.format(
+                    print('({0}) created by combine ({1}) with ({2})'.format(
                         self.cnf_format(self.__output_clauses[i][j]),
                         self.cnf_format(self.__detail_combinations[i][j][0]),
                         self.cnf_format(self.__detail_combinations[i][j][1])), file = f)
