@@ -1,5 +1,5 @@
 # CS143
-Cài đặt các thuật Nhập môn trí tuệ nhân tạo
+Cài đặt các thuật Cơ sở trí tuệ nhân tạo - CSC14003
 
 Kudos to my teammate, @Ndthang01
 
