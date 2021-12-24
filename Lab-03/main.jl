@@ -5,7 +5,9 @@ using DataFrames
 using Random
 
 # For testing only
+#=
 using DecisionTree
+=#
 
 # Split dataframe into parts with percentage.
 # Kudos to Bogumił Kamiński - https://stackoverflow.com/a/66059719
@@ -21,27 +23,14 @@ function splitdf(df, pct)
   return view(df, sel, :), view(df, .!sel, :)
 end
 
-struct ID3_Node
-  ids::Int64
-  entropy::Float64
-  depth::Int64
-  split_attribute::Bool
-  children::Vector{ID3_Node}
-  order::Int64
-  label::String
+# Calculate Entropy
+function entropy(freq::Array)
+  # Calculate sum of non-zeroes freq only.
+  freq_0 = filter(x -> x != 0, freq)
+  prob_0 = freq_0 / float.(sum(freq_0))
 
-  function set_props(split_attribute_, order_)
-    split_attribute = split_attribute_
-    order = order_
-  end
-
-  function set_label(label_)
-    label = label_
-  end
-end
-
-function entropy(freq)
-  freq_0 = freq[]
+  # Calculate entropy = -sum(prob_i * log(prob_i))
+  return -sum(prob_0 .* log.(prob_0))
 end
 
 # Loading dataset
