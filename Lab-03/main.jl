@@ -3,48 +3,166 @@
 using CSV
 using DataFrames
 using Random
+using Statistics
+using ScikitLearn: @sk_import
+@sk_import metrics: accuracy_score
+@sk_import model_selection: train_test_split
+
+println("Include finished")
 
 # For testing only
 #=
 using DecisionTree
 =#
 
-# Split dataframe into parts with percentage.
-# Kudos to Bogumił Kamiński - https://stackoverflow.com/a/66059719
-function splitdf(df, pct)
-  @assert 0 <= pct <= 1
-
-  ids = collect(axes(df, 1))
-
-  shuffle!(ids)
-
-  sel = ids .<= nrow(df) .* pct
-
-  return view(df, sel, :), view(df, .!sel, :)
-end
-
 # Calculate Entropy
-function entropy(freq::Array)
-  # Calculate sum of non-zeroes freq only.
-  freq_0 = filter(x -> x != 0, freq)
-  prob_0 = freq_0 / float.(sum(freq_0))
-
-  # Calculate entropy = -sum(prob_i * log(prob_i))
-  return -sum(prob_0 .* log.(prob_0))
+function entropy(counts, n_samples)
+  prob = [i / n_samples for i in counts]
+  return -sum(prob .* log.(prob))
 end
+
+function entropy_of_one_division(division)
+  n_samples = length(division)
+  n_classes = Set(division)
+
+  count = []
+
+  for s in n_classes
+    temp_count = 0
+    
+    for i in 1:n_samples
+      if division[i] == s
+        temp_count += 1
+      end
+    end
+
+    push!(count, temp_count)
+  end
+
+  return entropy(count, n_samples), n_samples
+end
+
+function get_entropy(y_predict, y)
+  n = length(y)
+  entropy_true, n_true = entropy_of_one_division(y[y_predict])
+  entropy_false, n_false = entropy_of_one_division(y[n - y_predict + 1])
+
+  s = n_true * entropy_true * 1.0 / n + n_false * entropy_false * 1.0 / n
+
+  return s
+end
+
+println("Entropy finished")
+
+struct ID3Tree
+  tree::Dict
+  depth::Int64
+end
+
+function fit(self::ID3Tree, X, y, node = Dict(), depth = 0)
+  if all(y == y[1])
+    return Dict("val" => y[1])
+
+  else
+    col_idx, cutoff, entropy = find_best_split_of_all(self, X, y)
+
+    y_left = y[X[:, col_idx] < cutoff]
+    y_right = y[X[:, col_idx] >= cutoff]
+
+    node["index_col"] = col_idx
+    node["cutoff"] = cutoff
+    node["val"] = mean(y)
+    node["left"] = fit(X[X[:, col_idx] < cutoff], y_left, Dict(), depth + 1)
+    node["right"] = fit(X[X[:, col_idx] >= cutoff], y_right, Dict(), depth + 1)
+    
+    self.depth += 1
+    self.tree = node
+
+    return node
+  end
+end
+
+function find_best_split_of_all(self::ID3Tree, X, y)
+  col_idx, cutoff = nothing, nothing
+  min_entropy = 1
+
+  for (i, col_data) in enumerate(transpose(X))
+    entropy, cur_cutoff = find_best_split(self, col_data, y)
+  
+    if entropy == 0
+      return i, cur_cutoff, entropy
+    end
+
+    if entropy <= min_entropy
+      min_entropy = entropy
+      col_idx = i
+      cutoff = cur_cutoff
+    end
+  end
+
+  return col_idx, cutoff, min_entropy
+end
+
+function find_best_split(self::ID3Tree, col_data, y)
+  min_entropy = 10
+
+  for value in Set(col_data)
+    y_predict = col_data < value
+    my_entropy = get_entropy(y_predict, y)
+
+    if my_entropy <= min_entropy
+      min_entropy = my_entropy
+      cutoff = value
+    end
+  end
+
+  return min_entropy, cutoff
+end
+
+function predict(self::ID3Tree, X)
+  tree = self.tree
+  pred = zeros(length(X))
+
+  for (i, c) in enumerate(X)
+    pred[i] = _predict(self, c)
+  end
+
+  return pred
+end
+
+function _predict(self::ID3Tree, row)
+  cur_layer = self.tree
+
+  while true
+    if get(cur_layer, "cutoff", false) == false
+      return cur_layer["val"]
+    else
+      if row[cur_layer["index_col"]] < cur_layer["cutoff"]
+        cur_layer = cur_layer["left"]
+      else
+        cur_layer = cur_layer["right"]
+      end
+    end
+  end
+end
+
+println("ID3Struct finished")
 
 # Loading dataset
 raw_df = DataFrame(CSV.File("iris.csv"))
 
-# Split dataset to training (2/3) and testing (1/3)
-train_df, test_df = splitdf(raw_df, 0.666666667)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33)
 
-X_train, X_test = train_df[!, Not("variety")], test_df[!, Not("variety")]
-y_train, y_test = train_df[!, "variety"], test_df[!, "variety"]
+println("Splitted successfully")
 
-X_train, X_test = float.(Matrix(X_train)), float.(Matrix(X_test))
-y_train, y_test = string.(y_train), string.(y_test)
 
+# Running 
+model = ID3Tree(Dict(), 0)
+tree = fit(model, X_train, y_train)
+train_pred = predict(model, X_train)
+println("Accuracy of decision tree on training data: $(accuracy_score(y_train, train_pred))")
+test_pred = predict(model, X_test)
+println("Accuracy of decision tree on testing data: $(accuracy_score(y_test, test_pred))")
 #=
 # For testing only.
 model = DecisionTreeClassifier(max_depth = 2)
