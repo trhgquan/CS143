@@ -8,7 +8,7 @@ julia
 
 - Đợi julia load, nhập:
 
-include("19120338.jl")
+include("main.jl")
 
 - Thời gian khởi động có thể hơi lâu.
 
