@@ -1,11 +1,11 @@
 # CS143
-Cài đặt các thuật Nhập môn trí tuệ nhân tạo
+Cài đặt các thuật Cơ sở trí tuệ nhân tạo - CSC14003
 
 Kudos to my teammate, @Ndthang01
 
 ## Topics
-1. Các thuật toán tìm kiếm đường đi
-2. Logic
-3. Học máy (comming)
+1. Các thuật toán tìm kiếm đường đi (Python)
+2. Logic (Python)
+3. Cài thuật ID3 cho bài toán phân lớp hoa Diên vĩ (Iris Classification), **Xài Julia**!
 
-VNUHCM - University of Science, Fall 2021.
+VNUHCM - US, mùa Thu 2021.
