@@ -5,12 +5,7 @@ using DataFrames
 using Random
 using Statistics
 using ScikitLearn.CrossValidation: train_test_split
-println("Include finished")
-
-# For testing only
-#=
-using DecisionTree
-=#
+using ScikitLearn.CrossValidation: cross_val_score
 
 # Calculate Entropy
 function entropy(counts, n_samples)
@@ -19,7 +14,7 @@ function entropy(counts, n_samples)
   end
 
   prob = [i / n_samples for i in counts]
-  return -sum(prob .* log.(prob))
+  return -sum(prob .* log2.(prob))
 end
 
 function entropy_of_one_division(division)
@@ -46,8 +41,6 @@ end
 function get_entropy(y_predict, y)
   n = length(y)
 
-#  println(y_predict, y)
-
   entropy_true, n_true = entropy_of_one_division(y[y_predict])
   entropy_false, n_false = entropy_of_one_division(y[Not(y_predict)])
 
@@ -56,15 +49,13 @@ function get_entropy(y_predict, y)
   return s
 end
 
-println("Entropy finished")
-
-struct ID3Tree
+mutable struct ID3Tree
   tree::Dict
   depth::Int64
 end
 
 function fit(self::ID3Tree, X, y, node = Dict(), depth = 0)
-  if all(y == y[1])
+  if all(y .== y[1])
     return Dict("val" => y[1])
 
   else
@@ -76,8 +67,9 @@ function fit(self::ID3Tree, X, y, node = Dict(), depth = 0)
     node["index_col"] = col_idx
     node["cutoff"] = cutoff
     node["val"] = mean(y)
-    node["left"] = fit(X[X[:, col_idx] < cutoff], y_left, Dict(), depth + 1)
-    node["right"] = fit(X[X[:, col_idx] >= cutoff], y_right, Dict(), depth + 1)
+
+    node["left"] = fit(self, X[X[:, col_idx] .< cutoff, :], y_left, Dict(), depth + 1)
+    node["right"] = fit(self, X[X[:, col_idx] .>= cutoff, :], y_right, Dict(), depth + 1)
 
     self.depth += 1
     self.tree = node
@@ -91,8 +83,6 @@ function find_best_split_of_all(self::ID3Tree, X, y)
   min_entropy = 1
 
   for i in 1:length(X[1, :])
-    println(length(X[:, 1]), i)
-    # println(X[:, i])
     entropy, cur_cutoff = find_best_split(self, X[:, i], y)
   
     if entropy == 0
@@ -129,10 +119,10 @@ end
 
 function predict(self::ID3Tree, X)
   tree = self.tree
-  pred = zeros(length(X))
-
-  for (i, c) in enumerate(X)
-    pred[i] = _predict(self, c)
+  pred = zeros(length(X[:, 1]))
+  
+  for i in 1:length(X[:, 1])
+    pred[i] = _predict(self, X[i, :])
   end
 
   return pred
@@ -154,19 +144,43 @@ function _predict(self::ID3Tree, row)
   end
 end
 
-println("ID3Struct finished")
+function accuracy_score(model, predicted)
+  n = length(model)
+
+  correct = 0
+  for i in 1:n
+    if (model[i] == predicted[i])
+      correct += 1
+    end
+  end
+
+  return correct * 1.0 / n
+end
 
 # Loading dataset
 raw_df = DataFrame(CSV.File("iris.csv"))
 
 X = float.(Matrix(raw_df[:, Not("variety")]))
-y = raw_df[:, "variety"]
+y = []
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3334)
+for s in raw_df[:, "variety"]
+  if s == "Setosa"
+    push!(y, 0)
+  end
 
-println("Splitted successfully")
+  if s == "Versicolor"
+    push!(y, 1)
+  end
+
+  if s == "Virginica"
+    push!(y, 2)
+  end
+end
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33)
+
 println("Training length: $(length(X_train))")
-println("Testing legth: $(length(X_test))")
+println("Testing length: $(length(X_test))")
 
 # Running 
 model = ID3Tree(Dict(), 0)
@@ -175,14 +189,4 @@ train_pred = predict(model, X_train)
 println("Accuracy of decision tree on training data: $(accuracy_score(y_train, train_pred))")
 test_pred = predict(model, X_test)
 println("Accuracy of decision tree on testing data: $(accuracy_score(y_test, test_pred))")
-#=
-# For testing only.
-model = DecisionTreeClassifier(max_depth = 2)
-fit!(model, X_train, y_train)
 
-print_tree(model, 5)
-
-using ScikitLearn.CrossValidation: cross_val_score
-
-accuracy = cross_val_score(model, X_test, y_test, cv = 3)
-=#
