@@ -5,9 +5,15 @@ using DataFrames
 using Random
 using Statistics
 using ScikitLearn.CrossValidation: train_test_split
-using ScikitLearn.CrossValidation: cross_val_score
+using ScikitLearn: @sk_import
+@sk_import metrics: accuracy_score
 
-# Calculate Entropy
+# Calculate Entropy based on probabilities list.
+# Input:
+#   - counts: list of each sample's appearences.
+#   - n_samples: total samples
+# Output:
+#   - Entropy of that list.
 function entropy(counts, n_samples)
   if n_samples == 0
     return 0
@@ -17,6 +23,12 @@ function entropy(counts, n_samples)
   return -sum(prob .* log2.(prob))
 end
 
+# Calculate entropy of a divided data group.
+# Input:
+#   - division: list of items after splitted
+# Output:
+#   - entropy of list of items
+#   - total samples
 function entropy_of_one_division(division)
   n_samples = length(division)
   n_classes = Set(division)
@@ -38,6 +50,12 @@ function entropy_of_one_division(division)
   return entropy(count, n_samples), n_samples
 end
 
+# Calculate entropy of a data split
+# Input:
+#   - y_predict: split decision by cutoff.
+#   - y: label vector
+# Output:
+#   - entropy of the split.
 function get_entropy(y_predict, y)
   n = length(y)
 
@@ -49,11 +67,18 @@ function get_entropy(y_predict, y)
   return s
 end
 
+# ID3 Tree struct
 mutable struct ID3Tree
   tree::Dict
   depth::Int64
 end
 
+# Fit a model.
+# Input:
+#   - X: training data
+#   - y: training labels
+# Output:
+#   - A tree node.
 function fit(self::ID3Tree, X, y, node = Dict(), depth = 0)
   if all(y .== y[1])
     return Dict("val" => y[1])
@@ -78,6 +103,14 @@ function fit(self::ID3Tree, X, y, node = Dict(), depth = 0)
   end
 end
 
+# Find best split over all data.
+# Input:
+#   - X: Data
+#   - y: Labels
+# Output:
+#   - col_idx: id of column having best split.
+#   - cutoff: cutoff value
+#   - min_entropy: entropy of that split.
 function find_best_split_of_all(self::ID3Tree, X, y)
   col_idx, cutoff = nothing, nothing
   min_entropy = 1
@@ -99,6 +132,13 @@ function find_best_split_of_all(self::ID3Tree, X, y)
   return col_idx, cutoff, min_entropy
 end
 
+# Find best split over a column
+# Input:
+#   - col_data: column data
+#   - y: labels
+# Output:
+#   - min_entropy: entropy of best split on that column
+#   - cutoff: cutoff value of that column
 function find_best_split(self::ID3Tree, col_data, y)
   min_entropy = 10
   cutoff = nothing
@@ -117,6 +157,11 @@ function find_best_split(self::ID3Tree, col_data, y)
   return min_entropy, cutoff
 end
 
+# Predict on a data.
+# Input:
+#   - X: data
+# Output:
+#   - pred: predicted labels
 function predict(self::ID3Tree, X)
   tree = self.tree
   pred = zeros(length(X[:, 1]))
@@ -128,6 +173,11 @@ function predict(self::ID3Tree, X)
   return pred
 end
 
+# Predict a data row
+# Input:
+#   - row: data row.
+# Output:
+#   - predicted label.
 function _predict(self::ID3Tree, row)
   cur_layer = self.tree
 
@@ -144,23 +194,14 @@ function _predict(self::ID3Tree, row)
   end
 end
 
-function accuracy_score(model, predicted)
-  n = length(model)
-
-  correct = 0
-  for i in 1:n
-    if (model[i] == predicted[i])
-      correct += 1
-    end
-  end
-
-  return correct * 1.0 / n
-end
-
 # Loading dataset
 raw_df = DataFrame(CSV.File("iris.csv"))
 
+# Training data will be first 4 columns.
 X = float.(Matrix(raw_df[:, Not("variety")]))
+
+# Labels will be the last column.
+# Converting it to integers for later use in mathematics formula.
 y = []
 
 for s in raw_df[:, "variety"]
@@ -177,16 +218,19 @@ for s in raw_df[:, "variety"]
   end
 end
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33)
+# Split dataset to train and test, using sklearn.crossvalidation.train_test_split.
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33, random_state = 42)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33)
 
-println("Training length: $(length(X_train))")
-println("Testing length: $(length(X_test))")
+println("Training dataset size: $(length(y_train))")
+println("Testing dataset size: $(length(y_test))")
 
-# Running 
+# Create a model and fitting it with training data.
 model = ID3Tree(Dict(), 0)
 tree = fit(model, X_train, y_train)
 train_pred = predict(model, X_train)
 println("Accuracy of decision tree on training data: $(accuracy_score(y_train, train_pred))")
+
+# Running predictions on testing data to give testing accuracy.
 test_pred = predict(model, X_test)
 println("Accuracy of decision tree on testing data: $(accuracy_score(y_test, test_pred))")
-
