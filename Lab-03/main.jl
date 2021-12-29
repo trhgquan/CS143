@@ -4,9 +4,6 @@ using CSV
 using DataFrames
 using Random
 using Statistics
-using ScikitLearn.CrossValidation: train_test_split
-using ScikitLearn: @sk_import
-@sk_import metrics: accuracy_score
 
 # Calculate Entropy based on probabilities list.
 # Input:
@@ -194,33 +191,81 @@ function _predict(self::ID3Tree, row)
   end
 end
 
+# Calculate accuracy score of a predict
+# Input:
+#   - y_predict: list of predicted labels
+#   - y_test: list of correct labels
+# Output:
+#   - Accuracy score
+function accuracy_score(y_predict, y_test)
+  correct = 0
+  total_samples = length(y_predict)
+
+  for i in 1:total_samples
+    if y_predict[i] == y_test[i]
+      correct += 1
+    end
+  end
+
+  return correct * 1.0 / total_samples
+end
+
+# Split dataframe to train and test, with test_size
+# Input:
+#   - df: dataframe to split
+#   - test_size: test dataset size
+#   - random_state: random seed.
+# Output:
+#   - Splitted train and test.
+#
+# Source: https://stackoverflow.com/a/66059719
+function train_test_split(df, test_size, random_state = 420)
+  Random.seed!(random_state)
+
+  @assert 0 <= test_size <= 1
+
+  train_size = 1 - test_size
+  
+  ids = collect(axes(df, 1))
+  shuffle!(ids)
+  sel = ids .<= nrow(df) .* train_size
+  return view(df, sel, :), view(df, .!sel, :)
+end
+
+# Split a raw dataframe to X (data) and y (label)
+# Input:
+#   - raw: raw dataframe
+# Output:
+#   - X: data
+#   - y: labels
+function create_data_label(raw)
+  X = float.(Matrix(raw[:, Not("variety")]))
+
+  y = []
+  for s in raw[:, "variety"]
+    if s == "Setosa"
+      push!(y, 0)
+    end
+
+    if s == "Versicolor"
+      push!(y, 1)
+    end
+
+    if s == "Virginica"
+      push!(y, 2)
+    end
+  end
+
+  return X, y
+end
+
 # Loading dataset
 raw_df = DataFrame(CSV.File("iris.csv"))
 
-# Training data will be first 4 columns.
-X = float.(Matrix(raw_df[:, Not("variety")]))
+raw_train, raw_test = train_test_split(raw_df, 0.33)
 
-# Labels will be the last column.
-# Converting it to integers for later use in mathematics formula.
-y = []
-
-for s in raw_df[:, "variety"]
-  if s == "Setosa"
-    push!(y, 0)
-  end
-
-  if s == "Versicolor"
-    push!(y, 1)
-  end
-
-  if s == "Virginica"
-    push!(y, 2)
-  end
-end
-
-# Split dataset to train and test, using sklearn.crossvalidation.train_test_split.
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33, random_state = 42)
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.33)
+X_train, y_train = create_data_label(raw_train)
+X_test, y_test = create_data_label(raw_test)
 
 println("Training dataset size: $(length(y_train))")
 println("Testing dataset size: $(length(y_test))")
