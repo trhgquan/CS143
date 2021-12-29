@@ -219,8 +219,10 @@ end
 #   - Splitted train and test.
 #
 # Source: https://stackoverflow.com/a/66059719
-function train_test_split(df, test_size, random_state = 420)
-  Random.seed!(random_state)
+function train_test_split(df; test_size, random_state = nothing)
+  if !isnothing(random_state)
+    Random.seed!(random_state)
+  end
 
   @assert 0 <= test_size <= 1
 
@@ -262,7 +264,7 @@ end
 # Loading dataset
 raw_df = DataFrame(CSV.File("iris.csv"))
 
-raw_train, raw_test = train_test_split(raw_df, 0.33)
+raw_train, raw_test = train_test_split(raw_df, test_size = 0.33, random_state = 420)
 
 X_train, y_train = create_data_label(raw_train)
 X_test, y_test = create_data_label(raw_test)
