@@ -1,7 +1,5 @@
 #!usr/bin/julia
 
-using CSV
-using DataFrames
 using Random
 using Statistics
 
@@ -57,7 +55,7 @@ function get_entropy(y_predict, y)
   n = length(y)
 
   entropy_true, n_true = entropy_of_one_division(y[y_predict])
-  entropy_false, n_false = entropy_of_one_division(y[Not(y_predict)])
+  entropy_false, n_false = entropy_of_one_division(y[.!(y_predict)])
 
   s = n_true * entropy_true * 1.0 / n + n_false * entropy_false * 1.0 / n
 
@@ -210,6 +208,20 @@ function accuracy_score(y_predict, y_test)
   return correct * 1.0 / total_samples
 end
 
+# Reading raw_df from csv file.
+# Input:
+#   - filename: csv file name.
+# Output:
+#   - Matrix consists of string values.
+function read_raw_df(filename)
+  df = readdlm(filename, ',', String, '\n')
+
+  # Ignore the column name
+  raw_df = mat[2:end, :]
+
+  return raw_df
+end
+
 # Split dataframe to train and test, with test_size
 # Input:
 #   - df: dataframe to split
@@ -227,11 +239,16 @@ function train_test_split(df; test_size, random_state = nothing)
   @assert 0 <= test_size <= 1
 
   train_size = 1 - test_size
-  
+
   ids = collect(axes(df, 1))
-  shuffle!(ids)
-  sel = ids .<= nrow(df) .* train_size
-  return view(df, sel, :), view(df, .!sel, :)
+  
+  # Shuffle the matrix
+  df = df[shuffle(1:end), :]
+
+  # Select training and testing dataset.
+  sel = ids .<= length(df[:, 1]) .* train_size
+
+  return df[sel, :], df[.!sel, :]
 end
 
 # Split a raw dataframe to X (data) and y (label)
@@ -241,10 +258,10 @@ end
 #   - X: data
 #   - y: labels
 function create_data_label(raw)
-  X = float.(Matrix(raw[:, Not("variety")]))
+  X = parse.(Float64, raw[:, 1:4])
 
   y = []
-  for s in raw[:, "variety"]
+  for s in raw[:, 5]
     if s == "Setosa"
       push!(y, 0)
     end
@@ -262,10 +279,12 @@ function create_data_label(raw)
 end
 
 # Loading dataset
-raw_df = DataFrame(CSV.File("iris.csv"))
+raw_df = read_raw_df("iris.csv")
 
-raw_train, raw_test = train_test_split(raw_df, test_size = 0.33, random_state = 420)
+# Split dataset intro training (2/3) and testing (1/3)
+raw_train, raw_test = train_test_split(raw_df, test_size = 0.33, random_state = 42)
 
+# Create training & testing data based on raw data.
 X_train, y_train = create_data_label(raw_train)
 X_test, y_test = create_data_label(raw_test)
 
