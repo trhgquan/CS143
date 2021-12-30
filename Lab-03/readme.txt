@@ -10,8 +10,6 @@ julia
 
 include("main.jl")
 
-- Thời gian khởi động có thể hơi lâu.
-
 ---
 Một số tài nguyên đã sử dụng:
 - iris.csv (https://gist.github.com/netj/8836201)
