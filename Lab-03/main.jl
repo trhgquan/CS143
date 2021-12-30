@@ -1,5 +1,6 @@
 #!usr/bin/julia
 
+using DelimitedFiles
 using Random
 using Statistics
 
@@ -217,7 +218,7 @@ function read_raw_df(filename)
   df = readdlm(filename, ',', String, '\n')
 
   # Ignore the column name
-  raw_df = mat[2:end, :]
+  raw_df = df[2:end, :]
 
   return raw_df
 end
