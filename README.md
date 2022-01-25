@@ -6,6 +6,7 @@ Kudos to my teammate, @Ndthang01
 ## Topics
 1. Các thuật toán tìm kiếm đường đi (Python)
 2. Logic (Python)
+    - Note: models + notebook thuộc về Bộ môn Khoa học Máy tính - fit@hcmus
 3. Cài thuật ID3 cho bài toán phân lớp hoa Diên vĩ (Iris Classification), **Xài Julia**!
 
 ## License
